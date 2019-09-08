@@ -1,4 +1,4 @@
-package com.dempaul.test;
+package com.dempaul;
 
 public interface MyMap {
 

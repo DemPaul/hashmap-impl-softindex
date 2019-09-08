@@ -1,4 +1,4 @@
-package com.dempaul.test;
+package com.dempaul;
 
 import org.junit.Assert;
 import org.junit.Before;
