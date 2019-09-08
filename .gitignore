@@ -1,0 +1,9 @@
+target/
+!**/src/test/**
+!**/src/main/**
+
+### IntelliJ IDEA ###
+.idea
+*.iml
+
+
