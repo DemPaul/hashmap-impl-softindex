@@ -4,22 +4,14 @@ import java.util.NoSuchElementException;
 
 public class MyHashMap implements MyMap {
 
-    private static final int DEFAULT_CAPACITY = 2;
+    private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private int capacity = DEFAULT_CAPACITY;
     private int size;
 
-    private Entry[] table = new Entry[capacity];
-
-    private class Entry {
-        private final int key;
-        private long value;
-
-        Entry(int key, long value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
+    private int[] keyTable = new int[capacity];
+    private long[] valueTable = new long[capacity];
+    private boolean[] presenceCheckTable = new boolean[capacity];
 
     @Override
     public void put(int key, long value) {
@@ -30,13 +22,15 @@ public class MyHashMap implements MyMap {
         int index;
         for (int i = 0; i < capacity; i++) {
             index = (hash + i) % capacity;
-            if (table[index] != null) {
-                if (table[index].key == key) {
-                    table[index].value = value;
+            if (presenceCheckTable[index]) {
+                if (keyTable[index] == key) {
+                    valueTable[index] = value;
                     break;
                 }
             } else {
-                table[index] = new Entry(key, value);
+                keyTable[index] = key;
+                valueTable[index] = value;
+                presenceCheckTable[index] = true;
                 size++;
                 break;
             }
@@ -49,9 +43,9 @@ public class MyHashMap implements MyMap {
         int index;
         for (int i = 0; i < capacity; i++) {
             index = (hash + i) % capacity;
-            if (table[index] != null) {
-                if (table[index].key == key) {
-                    return table[index].value;
+            if (presenceCheckTable[index]) {
+                if (keyTable[index] == key) {
+                    return valueTable[index];
                 }
             }
         }
@@ -65,12 +59,16 @@ public class MyHashMap implements MyMap {
 
     private void resize() {
         size = 0;
-        Entry[] oldTable = table;
-        capacity = table.length * 2;
-        table = new Entry[capacity];
-        for (Entry entry : oldTable) {
-            if (entry != null) {
-                put(entry.key, entry.value);
+        int[] oldKeyTable = keyTable;
+        long[] oldValueTable = valueTable;
+        boolean[] oldPresenceCheckTable = presenceCheckTable;
+        capacity *= 2;
+        keyTable = new int[capacity];
+        valueTable = new long[capacity];
+        presenceCheckTable = new boolean[capacity];
+        for (int i = 0; i < oldPresenceCheckTable.length; i++) {
+            if (oldPresenceCheckTable[i]) {
+                put(oldKeyTable[i], oldValueTable[i]);
             }
         }
     }
